@@ -1,0 +1,146 @@
+import tkinter as tk
+import pyautogui
+import time
+
+# הגדרות
+pyautogui.FAILSAFE = False
+pyautogui.PAUSE = 0.01
+
+# קואורדינטות בסיס
+FIRE = (1682, 768)
+CROUCH = (1686, 916)
+RELOAD = (1569, 861)
+JUMP = (1867, 716)
+AIM = (1737, 590)
+OPERATOR_SKILL = (1812, 432)
+HIP_FIRE = (518, 370)
+MOVE_CENTER = (250, 750)  # מרכז הג'ויסטיק
+PRIMARY_WEAPON = (961, 869)
+SECONDARY_WEAPON = (1142, 876)
+
+# יצירת החלון
+root = tk.Tk()
+root.title("Virtual Buttons for COD Mobile")
+root.geometry("300x700")
+
+# משתנה למעקב אחרי מצב לחיצה
+is_moving = False
+
+# פונקציות
+def click_at_position(position, hold=False):
+    if hold:
+        pyautogui.mouseDown(position[0], position[1])
+    else:
+        pyautogui.click(position[0], position[1])
+
+def release_move():
+    global is_moving
+    if is_moving:
+        pyautogui.mouseUp()
+        is_moving = False
+
+def fire(event=None):
+    click_at_position(FIRE)
+
+def crouch(event=None):
+    click_at_position(CROUCH)
+
+def reload(event=None):
+    click_at_position(RELOAD)
+
+def jump(event=None):
+    click_at_position(JUMP)
+
+def aim(event=None):
+    click_at_position(AIM)
+
+def operator_skill(event=None):
+    click_at_position(OPERATOR_SKILL)
+
+def hip_fire(event=None):
+    click_at_position(HIP_FIRE)
+
+def switch_primary(event=None):
+    click_at_position(PRIMARY_WEAPON)
+
+def switch_secondary(event=None):
+    click_at_position(SECONDARY_WEAPON)
+
+# פונקציית תנועה חדשה עם נעילה אמיתית!
+def start_move(direction):
+    global is_moving
+    release_move()
+    center_x, center_y = MOVE_CENTER
+
+    offsets = {
+        "up": (0, -50),
+        "down": (0, 50),
+        "left": (-50, 0),
+        "right": (50, 0),
+        "up_right": (35, -35),
+        "up_left": (-35, -35),
+        "down_right": (35, 35),
+        "down_left": (-35, 35)
+    }
+
+    if direction in offsets:
+        offset_x, offset_y = offsets[direction]
+        pyautogui.mouseDown(center_x, center_y)
+        time.sleep(0.05)
+        pyautogui.moveTo(center_x + offset_x, center_y + offset_y, duration=0.1)
+        is_moving = True
+
+def stop_movement(event=None):
+    release_move()
+
+# בניית הלחצנים
+tk.Button(root, text="Fire (F)", command=fire).pack()
+tk.Button(root, text="Crouch (C)", command=crouch).pack()
+tk.Button(root, text="Reload (R)", command=reload).pack()
+tk.Button(root, text="Jump (Space)", command=jump).pack()
+tk.Button(root, text="Aim (Q)", command=aim).pack()
+tk.Button(root, text="Operator Skill (E)", command=operator_skill).pack()
+tk.Button(root, text="Hip Fire (H)", command=hip_fire).pack()
+
+tk.Label(root, text="--- Movement ---").pack()
+tk.Button(root, text="Move Up (W)", command=lambda: start_move("up")).pack()
+tk.Button(root, text="Move Right (D)", command=lambda: start_move("right")).pack()
+tk.Button(root, text="Move Down (S)", command=lambda: start_move("down")).pack()
+tk.Button(root, text="Move Left (A)", command=lambda: start_move("left")).pack()
+tk.Button(root, text="Move Up-Right (E)", command=lambda: start_move("up_right")).pack()
+tk.Button(root, text="Move Up-Left (Q)", command=lambda: start_move("up_left")).pack()
+tk.Button(root, text="Move Down-Right (C)", command=lambda: start_move("down_right")).pack()
+tk.Button(root, text="Move Down-Left (Z)", command=lambda: start_move("down_left")).pack()
+
+tk.Label(root, text="--- Weapons ---").pack()
+tk.Button(root, text="Primary Weapon (1)", command=switch_primary).pack()
+tk.Button(root, text="Secondary Weapon (2)", command=switch_secondary).pack()
+
+# קישור מקשי קיצור
+root.bind("f", fire)
+root.bind("c", crouch)
+root.bind("r", reload)
+root.bind("<space>", jump)
+root.bind("q", lambda event: start_move("up_left"))
+root.bind("e", lambda event: start_move("up_right"))
+root.bind("z", lambda event: start_move("down_left"))
+root.bind("c", lambda event: start_move("down_right"))
+root.bind("w", lambda event: start_move("up"))
+root.bind("d", lambda event: start_move("right"))
+root.bind("s", lambda event: start_move("down"))
+root.bind("a", lambda event: start_move("left"))
+root.bind("1", switch_primary)
+root.bind("2", switch_secondary)
+
+# קישור לשחרור תנועה
+root.bind("<KeyRelease-w>", stop_movement)
+root.bind("<KeyRelease-a>", stop_movement)
+root.bind("<KeyRelease-s>", stop_movement)
+root.bind("<KeyRelease-d>", stop_movement)
+root.bind("<KeyRelease-q>", stop_movement)
+root.bind("<KeyRelease-e>", stop_movement)
+root.bind("<KeyRelease-z>", stop_movement)
+root.bind("<KeyRelease-c>", stop_movement)
+
+# הפעלת החלון
+root.mainloop()
